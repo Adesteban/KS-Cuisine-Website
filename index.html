@@ -180,6 +180,27 @@
 </div>
 </div>
 
+		<!-- Logout Modal -->
+		<div class="modal" id="logoutModal" tabindex="-1" role="dialog">
+		  <div class="modal-dialog" role="document">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <h5 class="modal-title">Confirm Logout</h5>
+		        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+		          <span aria-hidden="true">&times;</span>
+		        </button>
+		      </div>
+		      <div class="modal-body">
+		        <p>Are you sure you want to log out?</p>
+		      </div>
+		      <div class="modal-footer">
+		        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+		        <button type="button" class="btn btn-danger" id="logoutBtn">Logout</button>
+		      </div>
+		    </div>
+		  </div>
+		</div>
+
 
 	<!-- Start header -->
 	<header class="top-navbar">
@@ -204,18 +225,14 @@
 								<a class="dropdown-item" href="gallery.html">Gallery</a>
 							</div>
 						</li>
-						<li class="nav-item dropdown">
-							<a class="nav-link dropdown-toggle" href="#" id="dropdown-a" data-toggle="dropdown">Blog</a>
-							<div class="dropdown-menu" aria-labelledby="dropdown-a">
-								<a class="dropdown-item" href="blog.html">blog</a>
-								<a class="dropdown-item" href="blog-details.html">blog Single</a>
-							</div>
-						</li>
+
+						<li class="nav-item"><a class="nav-link" href="activity.html">Activity</a></li>
+
 						<li class="nav-item dropdown">
 							<a class="nav-link dropdown-toggle" href="#" id="dropdown-a" data-toggle="dropdown">Contact</a>
 							<div class="dropdown-menu" aria-labelledby="dropdown-a">
 								<a class="dropdown-item" href="contact.html">Contact Us</a>
-								<a class="dropdown-item" id="logoutBtn">Logout</a>
+								<a class="dropdown-item" data-toggle="modal" data-target="#logoutModal">Logout</a>
 							</div>
 						</li>
 					</ul>
@@ -782,8 +799,8 @@
 		  measurementId: "G-4DW5VGPK6B"
 		};
 
-		import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut, sendPasswordResetEmail } from 'https://www.gstatic.com/firebasejs/9.21.0/firebase-auth.js'
-		import { getDatabase, ref, set, limitToLast, get, orderByKey, query, equalTo } from 'https://www.gstatic.com/firebasejs/9.21.0/firebase-database.js';
+		import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut, sendPasswordResetEmail, setPersistence } from 'https://www.gstatic.com/firebasejs/9.21.0/firebase-auth.js'
+		import { getDatabase, ref, set, limitToLast, get, orderByKey, query, equalTo, update } from 'https://www.gstatic.com/firebasejs/9.21.0/firebase-database.js';
 
 		// Initialize Firebase
 		const app = initializeApp(firebaseConfig);
@@ -828,6 +845,11 @@
 		var loginBtn = document.getElementById("loginBtn");
 		var logoutBtn = document.getElementById("logoutBtn");
 
+		const fnameWarning = document.getElementById('fname-warning');
+	  const lnameWarning = document.getElementById('lname-warning');
+	  const emailWarning = document.getElementById('email-warning');
+	  const passwordWarning = document.getElementById('password-warning');
+
 
 		//-----------Check if there is a user currently logged in------------//
 		auth.onAuthStateChanged((user) => {
@@ -850,264 +872,218 @@
 
 		//-----------User Authentication Login-------------//
 		loginBtn.addEventListener('click', async () => {
-			const email = emailLogin.value;
-			const password = passLogin.value;
+			event.preventDefault(); 
+		  const email = emailLogin.value;
+		  const password = passLogin.value;
 
-			if (email === "admin" && password === "123456") {
-				// Log in as Admin
-				console.log('Admin logged in', email);
-   		  alert(`Admin ${email} successfully logged in.`);
-    		emailLogin.value = '';
-    		passLogin.value = '';
-
-    		window.location.href = 'admin.html';
-			}
-			else {
-				try {
-				const userCredential = await signInWithEmailAndPassword(auth, email, password);
-				const user = userCredential.user.email;
-				console.log('User logged in', user);
-				alert(`User ${user} successfully logged in.`);
-				emailLogin.value = '';
-				passLogin.value = '';
-			}
-			catch (error) {
-			  const errorCode = error.code;
-    		const errorMessage = error.message;
-    		const warningMessage = document.getElementById('warning-message');
-    		const warningMessageEmail = document.getElementById('warning-message-email');
-
-    		// Show warning message
-				if(errorCode === 'auth/invalid-email'){
-					warningMessage.textContent = 'Incorrect email or password. Try again.';
-					warningMessage.style.display = 'block';
-					console.log("Error: ", error);
-				}
-				else if (errorCode === 'auth/missing-email') {
-					 warningMessageEmail.textContent = 'Please fill up the email.';
-					 warningMessageEmail.style.display = 'block';
-					 console.log("Error: ", error);
-				}
-				else if(errorCode === 'auth/network-request-failed'){
-					warningMessage.textContent = 'Network request failed. Please try again later.';
-					warningMessage.style.display = 'block';
-					console.log("Error: ", error);
-				}
-				else if(errorCode === 'auth/missing-password'){
-					warningMessage.textContent = 'Please fill up the password.';
-					warningMessage.style.display = 'block';
-					console.log("Error: ", error);
-				}
-				else {
-					warningMessageEmail.textContent = 'User not found. Please try again.';
-					warningMessageEmail.style.display = 'block';
-					console.log("Error: ", error);
-				}
-			}
-			}
-
-			
+		  if (email === "admin" && password === "123456") {
+		    // Log in as Admin
+		    console.log('Admin logged in', email);
+		    alert(`Admin ${email} successfully logged in.`);
+		    clearInputFields();
+		    window.location.href = 'admin.html';
+		  }else {
+		    try {
+		      const userAuth = await signInWithEmailAndPassword(auth, email, password);
+		      const user = userAuth.user.email;
+		      console.log('User logged in', user);
+		      clearInputFields();
+		      alert(`User ${user} successfully logged in.`);      
+		    } catch (error) {
+		      handleLoginError(error.code);
+		      console.log("Error: ", error);
+		    }
+		  }
 		});
 
 		//------------Log out the user------------------------------//
-		logoutBtn.addEventListener('click', () => {
-			auth.signOut().then(() => {
-				
-				console.log('User has been logged out');
-				alert('User has been logged out');
-			}).catch((error) => {
-				console.log('An error occurred while logging out')
-			});
+		logoutBtn.addEventListener('click', async () => {
+			await signOut(auth);
+			alert("User successfully logout.");	
+			sessionStorage.clear();
+
+			// Hide the modal
+    	$("#logoutModal").modal("hide");
 		});
 
 		//-------------Send an Email for Password Reset-----------------//
-		resetBtn.addEventListener('click', () => {
+		resetBtn.addEventListener('click', async () => {
+			event.preventDefault();
 			const email = emailReset.value;
 
-			sendPasswordResetEmail(auth, email)
+			await sendPasswordResetEmail(auth, email)
 				.then(() => {
 					 console.log("Password reset email has been sent.");
 					 alert(`Password reset email has been sent to ${email}`);
+					 emailWarningReset.textContent = '';
+					 emailWarningReset.style.display = 'none';
+					 clearInputFields();
+
 				}).catch((error) => {
 						const errorCode = error.code;
     				const errorMessage = error.message;
-    				const emailWarning = document.getElementById('warning-message-reset');
+    				const emailWarningReset = document.getElementById('warning-message-reset');
 
     				if (errorCode === 'auth/invalid-email') {
-    					emailWarning.textContent = 'Invalid email';
+    					emailWarningReset.textContent = 'Invalid email';
     					console.log("Invalid email");
-							emailWarning.style.display = 'block';
+							emailWarningReset.style.display = 'block';
     				}
     				else if(errorCode === 'auth/user-not-found') {
-							emailWarning.textContent = 'User not found';
-							emailWarning.style.display = 'block';
+							emailWarningReset.textContent = 'User not found';
+							emailWarningReset.style.display = 'block';
 							console.log("User not found");
     				}
     				else {
-							emailWarning.textContent = 'An error occurred, please try again later.';
-							emailWarning.style.display = 'block';    					
+							emailWarningReset.textContent = 'An error occurred, please try again later.';
+							emailWarningReset.style.display = 'block';    					
     				}
 				});
 		});
 
-		//-------------User Authentication Registration-------------//
-		registerBtn.addEventListener('click', async() => {
-			 const fname = fnameReg.value;
-			 const lname = lnameReg.value;
-			 const username = usernameReg.value;
-			 const email = emailReg.value;
-			 const password = passwordReg.value;
-			 const fnameWarning = document.getElementById('fname-warning');
-			 const lnameWarning = document.getElementById('lname-warning');
-			 const emailWarning = document.getElementById('email-warning');
-			 const passwordWarning = document.getElementById('password-warning');
-
-			 // Password must contain at least 6 characters, one lowercase letter, one uppercase letter, and one number
-  		 let passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/;
-
-  		 let nameRegex = /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
-
-  		 if(fname === '' && lname === '' && username === '' && email === '' & password === '') {
-  		 	  console.log("Please answer all the fields.");
-			    passwordWarning.textContent = 'Please answer all the fields.';
-			    passwordWarning.style.display = 'block';
-			    return;
-  		 }
-
-  		 if (nameRegex.test(fname)) {
-		   		
-			    console.log("First name should not contain special characters.");
-			    fnameWarning.textContent = 'First name should not contain special characters.';
-			    fnameWarning.style.display = 'block';
-			    return;
-		   };
-
-		   if(nameRegex.test(lname)) {
-		   		
-			    console.log("Last name should not contain special characters.");
-			    lnameWarning.textContent = 'Last name should not contain special characters.';
-			    lnameWarning.style.display = 'block';
-			    return;
-		   };
-
-  		 if (!passwordRegex.test(passwordReg.value)) {
-			    // Show warning message
-			    console.log("Password must contain at least 8 characters, one lowercase letter, one uppercase letter, and one number.");
-			    passwordWarning.textContent = 'Password must contain at least 8 characters, one lowercase letter, one uppercase letter, and one number.';
-			    passwordWarning.style.display = 'block';
-			    return;
-		   };	
-
-		   try{
-		   	const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-		   	const user = userCredential.user.email;
-		   	console.log(`User ${user} has been authenticated.`);
-			 		// Get the last user ID that was set in the sessionStorage
-			 	const lastId = sessionStorage.getItem('lastId');
-			 	console.log('Last user ID stored in session Storage: ', lastId);
-			 	
-
-			 	// Increment the last user ID
-			 	let newId = parseInt(lastId) + 1;
-			 	console.log(newId);
-					set(ref(database, "Users/" + newId), {
-						userId: newId,
-						fistName: fname,
-						lastName: lname,
-						username: username,
-						email: email,
-						password: password,
-					})
-					.then(() => {
-						alert(`User ${fname} has successfully registered!`);
-						console.log("Success! Check database");
-						fnameReg.value = '';
-						lnameReg.value ='';
-						usernameReg.value ='';
-						emailReg.value = '';
-						passwordReg.value = '';
-
-					})
-					.catch((error) => {
-						alert("Error, registration failed." + error);
-						console.log("Failed");
-					});
+	//-------------User Authentication Registration-------------//
+	registerBtn.addEventListener('click', async () => {
+		event.preventDefault(); 
+	  const fname = fnameReg.value;
+	  const lname = lnameReg.value;
+	  const username = usernameReg.value;
+	  const email = emailReg.value;
+	  const password = passwordReg.value;
 
 
+	  // Password must contain at least 8 characters, one lowercase letter, one uppercase letter, and one number
+	  const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/;
+	  const nameRegex = /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~0-9]/;
 
-		   }
-		   catch (error) {
-		   	  let errorCode = error.code;
-					let errorMessage = error.message;
+	  if (fname === '' || lname === '' || username === '' || email === '' || password === '') {
+	    console.log('Please answer all the fields.');
+	    passwordWarning.textContent = 'Please answer all the fields.';
+	    passwordWarning.style.display = 'block';
+	    return;
+	  }
 
-					if(errorCode === 'auth/email-already-in-use') {
-						// Shows a message prompt that the email already exists
-						console.log('Email already exists');
-						
-						emailWarning.textContent = 'Email already exists';
-						emailWarning.style.display = 'block';
-					}	
-					else if (errorCode === 'auth/invalid-email') {
-						 console.log('Invalid email format');
-						 emailWarning.textContent = 'Invalid email format.';
-						 emailWarning.style.display = 'block';
-					}
-					else {
-						console.log(errorMessage);
-					}
-		   }
+	  if (nameRegex.test(fname)) {
+	    console.log('First name should not contain special characters and numbers.');
+	    fnameWarning.textContent = 'First name should not contain special characters.';
+	    fnameWarning.style.display = 'block';
+	    return;
+	  }
 
-		   
+	  if (nameRegex.test(lname)) {
+	    console.log('Last name should not contain special characters.');
+	    lnameWarning.textContent = 'Last name should not contain special characters and numbers.';
+	    lnameWarning.style.display = 'block';
+	    return;
+	  }
 
-			 // createUserWithEmailAndPassword(auth, email, password)
-			 // 	.then((userCredential) => {
-			 // 		// Check authentication if success
-			 // 		const user = userCredential.user.email;
-			 // 		console.log(`User ${user} has been authenticated.`);
-			 // 		// Get the last user ID that was set in the sessionStorage
-			 // 		const lastId = sessionStorage.getItem('lastId');
-			 // 		console.log('Last user ID stored in session Storage: ', lastId);
+	  if (!passwordRegex.test(password)) {
+	    console.log('Password must contain at least 8 characters, one lowercase letter, one uppercase letter, and one number.');
+	    passwordWarning.textContent = 'Password must contain at least 8 characters, one lowercase letter, one uppercase letter, and one number.';
+	    passwordWarning.style.display = 'block';
+	    return;
+	  }
 
-			 // 		// Increment the last user ID
-			 // 		let newId = parseInt(lastId) + 1;
-				// 	set(ref(database, "Users/" + newId), {
-				// 		userId: newId,
-				// 		fistName: fname,
-				// 		lastName: lname,
-				// 		username: username,
-				// 		email: email,
-				// 		password: password,
-				// 	})
-				// 	.then(() => {
-				// 		alert(`User ${fname} has successfully registered!`);
-				// 		console.log("Success! Check database");
-				// 		fnameReg.value = '';
-				// 		lnameReg.value ='';
-				// 		usernameReg.value ='';
-				// 		emailReg.value = '';
-				// 		passwordReg.value = '';
+	  try {
+	    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+	    const user = userCredential.user.email;
+	    console.log(`User ${user} has been authenticated.`);
 
-				// 	})
-				// 	.catch((error) => {
-				// 		alert("Error, registration failed." + error);
-				// 		console.log("Failed");
-				// 	});
+	    // Get the last user ID that was set in the sessionStorage
+	    const lastId = sessionStorage.getItem('lastId');
+	    console.log('Last user ID stored in session Storage:', lastId);
 
-				// }).catch((error) => {
-				// 	// Shows an error message if unsuccessful
-				// 	const errorCode = error.code;
-				// 	const errorMessage = error.message;
-				// 	console.error(`Error ${errorCode}: ${errorMessage}`);
+	    // Increment the last user ID
+	    const newId = parseInt(lastId) + 1;
+	    console.log(newId);
 
-				// 	if(errorCode === 'auth/email-already-in-use') {
-				// 		// Shows a message prompt that the email already exists
-				// 		console.log('Email already exists');
-				// 		const emailWarning = document.getElementById('email-warning');
-				// 		emailWarning.textContent = 'Email already exists';
-				// 		emailWarning.style.display = 'block';
-				// 	};
-				// });
-		});
+	    // Add user to Realtime Database
+	    const userData = {
+	      userId: newId,
+	      firstName: fname,	
+	      lastName: lname,
+	      username: username,
+	      email: email,
+	      password: password,
+	    };
+
+	    await set(ref(database, `Users/${newId}`), userData);
+	    alert(`Registration Successful! User ${fname} has successfully registered!`);
+	    clearInputFields();
+	    console.log('Success! Check database');
+
+	    // Sign out the user
+  	  await signOut(auth);
+  		console.log('User signed out.');
+
+	  } catch (error) {
+	    const errorCode = error.code;
+	    const errorMessage = error.message;
+
+	    if (errorCode === 'auth/email-already-in-use') {
+	      console.log('Email already exists');
+	      emailWarning.textContent = 'Email already exists';
+	      emailWarning.style.display = 'block';
+	    } else if (errorCode === 'auth/invalid-email') {
+	      console.log('Invalid email format');
+	      emailWarning.textContent = 'Invalid email format.';
+	      emailWarning.style.display = 'block';
+	    } else {
+	      console.log(errorMessage);
+	    }
+	  }
+	});
+
+		function clearInputFields() {
+			emailLogin.value = '';
+			passLogin.value = '';
+			fnameReg.value = '';
+			lnameReg.value ='';
+			usernameReg.value ='';
+			emailReset.value = '';
+			emailReg.value = '';
+			passwordReg.value = '';
+			fnameWarning.textContent = '';
+			lnameWarning.textContent = '';
+			emailWarning.textContent = ''; 
+			passwordWarning.textContent = '';
+
+			 // Hide warning message elements
+		  fnameWarning.style.display = 'none';
+		  lnameWarning.style.display = 'none';
+		  emailWarning.style.display = 'none';
+		  passwordWarning.style.display = 'none';
+		}
+
+		function displayWarningMessage(elementId, message) {
+		  const element = document.getElementById(elementId);
+		  element.textContent = message;
+		  element.style.display = 'block';
+	  }
+
+	  function handleLoginError(errorCode) {
+		  const warningMessage = document.getElementById('warning-message');
+		  const warningMessageEmail = document.getElementById('warning-message-email');
+
+		  switch (errorCode) {
+		    case 'auth/invalid-email':
+		    case 'auth/wrong-password':
+		      displayWarningMessage('warning-message', 'Incorrect email or password. Try again.');
+		      break;
+		    case 'auth/missing-email':
+		      displayWarningMessage('warning-message-email', 'Please fill up the email.');
+		      break;
+		    case 'auth/missing-password':
+		      displayWarningMessage('warning-message', 'Please fill up the password.');
+		      break;
+		    case 'auth/network-request-failed':
+		      displayWarningMessage('warning-message', 'Network request failed. Please try again later.');
+		      break;
+		    default:
+		      displayWarningMessage('warning-message-email', 'User not found. Please try again.');
+		      break;
+		  }
+		};
+
 
 	
 </script>

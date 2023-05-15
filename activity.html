@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
  
      <!-- Site Metas -->
-    <title>Contact</title>  
+    <title>Staff</title>  
     <meta name="keywords" content="">
     <meta name="description" content="">
     <meta name="author" content="">
@@ -25,6 +25,15 @@
     <link rel="stylesheet" href="css/responsive.css">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="css/custom.css">
+      <style>
+    .order-box {
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      padding: 10px;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+  </style>	
 
     <!--[if lt IE 9]>
       <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
@@ -49,16 +58,16 @@
 						<li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
 						<li class="nav-item"><a class="nav-link" href="menu.html">Menu</a></li>
 						<li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
-						<li class="nav-item dropdown">
+						<li class="nav-item active dropdown">
 							<a class="nav-link dropdown-toggle" href="#" id="dropdown-a" data-toggle="dropdown">Pages</a>
 							<div class="dropdown-menu" aria-labelledby="dropdown-a">
 								<a class="dropdown-item" href="reservation.html">Reservation</a>
-								<a class="dropdown-item" href="stuff.html">Stuff</a>
+								<a class="dropdown-item" href="stuff.html">Staff</a>
 								<a class="dropdown-item" href="gallery.html">Gallery</a>
 							</div>
 						</li>
 						<li class="nav-item"><a class="nav-link" href="activity.html">Activity</a></li>
-						<li class="nav-item active"><a class="nav-link" href="contact.html">Contact</a></li>
+						<li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
 					</ul>
 				</div>
 			</div>
@@ -71,72 +80,25 @@
 		<div class="container text-center">
 			<div class="row">
 				<div class="col-lg-12">
-					<h1>Contact</h1>
+					<h1>Recent Orders</h1>
 				</div>
 			</div>
 		</div>
 	</div>
 	<!-- End All Pages -->
 	
-	<!-- Start Contact -->
-	<div class="map-full"></div>
-	<div class="contact-box">
-		<div class="container">
-			<div class="row">
-				<div class="col-lg-12">
-					<div class="heading-title text-center">
-						<h2>Contact</h2>
-						<p>Thank you for your interest in contacting us. Please fill out the form below to get in touch with us. We'll do our best to get back to you as soon as possible. Alternatively, you can email us directly or reach out to us on social media.</p>
-					</div>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-lg-12">
-					<form id="contactForm">
-						<div class="row">
-							<div class="col-md-12">
-								<div class="form-group">
-									<input type="text" class="form-control" id="name" name="name" placeholder="Your Name" required data-error="Please enter your name">
-									<div class="help-block with-errors"></div>
-								</div>                                 
-							</div>
-							<div class="col-md-12">
-								<div class="form-group">
-									<input type="text" placeholder="Your Email" id="email" class="form-control" name="name" required data-error="Please enter your email">
-									<div class="help-block with-errors"></div>
-								</div> 
-							</div>
-							<div class="col-md-12">
-								<div class="form-group">
-									<select class="custom-select d-block form-control" id="guest" required data-error="Please Select Person">
-									  <option disabled selected>Please Select Person*</option>
-									  <option value="1">1</option>
-									  <option value="2">2</option>
-									  <option value="3">3</option>
-									  <option value="4">4</option>
-									  <option value="5">5</option>
-									</select>
-									<div class="help-block with-errors"></div>
-								</div> 
-							</div>
-							<div class="col-md-12">
-								<div class="form-group"> 
-									<textarea class="form-control" id="message" placeholder="Your Message" rows="4" data-error="Write your message" required></textarea>
-									<div class="help-block with-errors"></div>
-								</div>
-								<div class="submit-button text-center">
-									<button class="btn btn-common" id="submit" type="submit">Send Message</button>
-									<div id="msgSubmit" class="h3 text-center hidden"></div> 
-									<div class="clearfix"></div> 
-								</div>
-							</div>
-						</div>            
-					</form>
-				</div>
-			</div>
-		</div>
+	<!-- Start Stuff -->
+	<div class="stuff-box">
+	  <div class="container">
+	    <h1 class="mt-4">Activity</h1>
+
+	    <div id="orderList" class="mt-4">
+	      <!-- The list of orders will be dynamically generated here -->
+	    </div>
+
+	  </div>
 	</div>
-	<!-- End Contact -->
+	<!-- End Stuff -->
 	
 	
 	<!-- Start Contact info -->
@@ -228,7 +190,8 @@
 		</div>
 		
 	</footer>
-	<!-- End Footer -->	
+	<!-- End Footer -->
+	
 	<a href="#" id="back-to-top" title="Back to top" style="display: none;"><i class="fa fa-paper-plane-o" aria-hidden="true"></i></a>
 
 	<!-- ALL JS FILES -->
@@ -236,27 +199,49 @@
 	<script src="js/popper.min.js"></script>
 	<script src="js/bootstrap.min.js"></script>
     <!-- ALL PLUGINS -->
-	
 	<script src="js/jquery.superslides.min.js"></script>
 	<script src="js/images-loded.min.js"></script>
 	<script src="js/isotope.min.js"></script>
 	<script src="js/baguetteBox.min.js"></script>
-	<script src="js/jquery.mapify.js"></script>
 	<script src="js/form-validator.min.js"></script>
     <script src="js/contact-form-script.js"></script>
     <script src="js/custom.js"></script>
-	<script>
-		$('.map-full').mapify({
-			points: [
-				{
-					lat: 40.7143528,
-					lng: -74.0059731,
-					marker: true,
-					title: 'Marker title',
-					infoWindow: 'Live Dinner Restaurant'
-				}
-			]
-		});	
-	</script>
+    <script type="text/javascript">
+	    // Retrieve existing orders from session storage
+	    const existingOrders = JSON.parse(sessionStorage.getItem('orders')) || [];
+
+	    // Get the order list element
+	    const orderListElement = document.getElementById('orderList');
+
+	    // Check if there are any orders
+	    if (existingOrders.length === 0) {
+	      orderListElement.innerHTML = '<p>No orders available.</p>';
+	    } else {
+	      // Loop through the orders and create order boxes
+	      existingOrders.forEach(order => {
+	        const orderBox = document.createElement('div');
+	        orderBox.classList.add('order-box');
+
+	        const orderHTML = `
+	          <h4>Order Details</h4>
+	          <ul>
+	            <li>Delivery Date: ${order.deliveryDate}</li>
+	            <li>Delivery Address: ${order.deliveryAddress}</li>
+	            <li>Payment Mode: ${order.paymentMode}</li>
+	            <li>Total Cost: ₱${order.totalCost}</li>
+	          </ul>
+	          <h4>Items</h4>
+	          <ul>
+	            ${order.items.map(item => `<li>${item.name}: ${item.quantity} x ₱${item.item} - Total: ₱${item.total}</li>`).join('')}
+	          </ul>
+	        `;
+
+	        orderBox.innerHTML = orderHTML;
+	        orderListElement.appendChild(orderBox);
+	      });
+	    }
+
+
+    </script>
 </body>
 </html>

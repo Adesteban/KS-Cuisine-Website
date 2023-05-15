@@ -1,4 +1,4 @@
-KS Cuisine - Online Food Reservation(V1.3)
+KS Cuisine - Online Food Reservation(V1.4)
 
 New Features:
 1.) Added additional web pages (blog, blog-details, gallery, and contact) - Complete!
