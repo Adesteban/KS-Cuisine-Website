@@ -93,10 +93,6 @@
 	  <!-- Submit button -->
 	  <button id="loginBtn" class="btn btn-primary btn-block mb-4 btn-lg btn-circle btn-outline-new-white">Sign in</button>
 
-	  		<!-- Register buttons -->
-	  		<div class="text-center">
-	    		<p>Not a member? <a href="#pils-register">Register</a></p>
-				</div>
 					</form>
 		</div>
 
@@ -872,29 +868,33 @@
 
 		//-----------User Authentication Login-------------//
 		loginBtn.addEventListener('click', async () => {
-			event.preventDefault(); 
+		  event.preventDefault(); 
 		  const email = emailLogin.value;
 		  const password = passLogin.value;
 
-		  if (email === "admin" && password === "123456") {
-		    // Log in as Admin
-		    console.log('Admin logged in', email);
-		    alert(`Admin ${email} successfully logged in.`);
-		    clearInputFields();
-		    window.location.href = 'admin.html';
-		  }else {
-		    try {
-		      const userAuth = await signInWithEmailAndPassword(auth, email, password);
-		      const user = userAuth.user.email;
-		      console.log('User logged in', user);
+		  try {
+		    const userAuth = await signInWithEmailAndPassword(auth, email, password);
+		    const user = userAuth.user;
+
+		    if (user.email === "kscuisine.admin@gmail.com") {
+		      // Redirect to admin.html for admin user
+		      console.log('Admin logged in', user.email);
+		      alert(`Admin ${user.email} successfully logged in.`);
 		      clearInputFields();
-		      alert(`User ${user} successfully logged in.`);      
-		    } catch (error) {
-		      handleLoginError(error.code);
-		      console.log("Error: ", error);
+		      window.location.href = 'admin.html';
+		    } else {
+		      // Handle regular user login
+		      console.log('User logged in', user.email);
+		      clearInputFields();
+		      alert(`User ${user.email} successfully logged in.`);
+		      // Additional logic for regular user
 		    }
+		  } catch (error) {
+		    handleLoginError(error.code);
+		    console.log("Error: ", error);
 		  }
 		});
+
 
 		//------------Log out the user------------------------------//
 		logoutBtn.addEventListener('click', async () => {

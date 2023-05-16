@@ -58,7 +58,7 @@
 						<li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
 						<li class="nav-item"><a class="nav-link" href="menu.html">Menu</a></li>
 						<li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
-						<li class="nav-item active dropdown">
+						<li class="nav-item dropdown">
 							<a class="nav-link dropdown-toggle" href="#" id="dropdown-a" data-toggle="dropdown">Pages</a>
 							<div class="dropdown-menu" aria-labelledby="dropdown-a">
 								<a class="dropdown-item" href="reservation.html">Reservation</a>
@@ -66,7 +66,7 @@
 								<a class="dropdown-item" href="gallery.html">Gallery</a>
 							</div>
 						</li>
-						<li class="nav-item"><a class="nav-link" href="activity.html">Activity</a></li>
+						<li class="nav-item active"><a class="nav-link" href="activity.html">Activity</a></li>
 						<li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
 					</ul>
 				</div>
@@ -92,9 +92,8 @@
 	  <div class="container">
 	    <h1 class="mt-4">Activity</h1>
 
-	    <div id="orderList" class="mt-4">
-	      <!-- The list of orders will be dynamically generated here -->
-	    </div>
+			  <!-- Display the orders -->
+			  <div id="ordersContainer"></div>
 
 	  </div>
 	</div>
@@ -207,40 +206,49 @@
     <script src="js/contact-form-script.js"></script>
     <script src="js/custom.js"></script>
     <script type="text/javascript">
-	    // Retrieve existing orders from session storage
-	    const existingOrders = JSON.parse(sessionStorage.getItem('orders')) || [];
-
-	    // Get the order list element
-	    const orderListElement = document.getElementById('orderList');
+	    // Retrieve the orders from session storage
+	    const orders = JSON.parse(sessionStorage.getItem('orders'));
 
 	    // Check if there are any orders
-	    if (existingOrders.length === 0) {
-	      orderListElement.innerHTML = '<p>No orders available.</p>';
-	    } else {
-	      // Loop through the orders and create order boxes
-	      existingOrders.forEach(order => {
-	        const orderBox = document.createElement('div');
-	        orderBox.classList.add('order-box');
+	    if (orders && orders.length > 0) {
+	      // Build the HTML for displaying orders
+	      let ordersHTML = '';
+	      orders.forEach(order => {
+	        // Build the delivery address string
+	        const deliveryAddress = `${order.deliveryAddress.houseNumber} ${order.deliveryAddress.street}, ${order.deliveryAddress.district}, ${order.deliveryAddress.city}, ${order.deliveryAddress.zipCode}`;
 
-	        const orderHTML = `
-	          <h4>Order Details</h4>
-	          <ul>
-	            <li>Delivery Date: ${order.deliveryDate}</li>
-	            <li>Delivery Address: ${order.deliveryAddress}</li>
-	            <li>Payment Mode: ${order.paymentMode}</li>
-	            <li>Total Cost: ₱${order.totalCost}</li>
-	          </ul>
-	          <h4>Items</h4>
-	          <ul>
-	            ${order.items.map(item => `<li>${item.name}: ${item.quantity} x ₱${item.item} - Total: ₱${item.total}</li>`).join('')}
-	          </ul>
+	        // Build the HTML for the order
+	        ordersHTML += `
+	          <div class="order-box">
+	            <h4>Order Items:</h4>
+	            <ul>
 	        `;
 
-	        orderBox.innerHTML = orderHTML;
-	        orderListElement.appendChild(orderBox);
-	      });
-	    }
+	        order.items.forEach(item => {
+	          ordersHTML += `
+	            <li>- ${item.name}: ${item.quantity} x ₱${item.item} - Total: ₱${item.total}</li>
+	          `;
+	        });
 
+	        ordersHTML += `
+	            </ul>
+	            <p>Delivery Date: ${order.deliveryDate}</p>
+	            <p>Delivery Address: ${deliveryAddress}</p>
+	            <p>Payment Mode: ${order.paymentMode}</p>
+	            <h4>Total Cost: ₱${order.totalCost}</h4>
+	          </div>
+	        `;
+	      });
+
+	      // Set the orders HTML to the orders container
+	      const ordersContainer = document.getElementById("ordersContainer");
+	      ordersContainer.innerHTML = ordersHTML;
+	    } else {
+	      // No orders found, display a message
+	      const noOrdersMessage = "<p>No orders found.</p>";
+	      const ordersContainer = document.getElementById("ordersContainer");
+	      ordersContainer.innerHTML = noOrdersMessage;
+	    }
 
     </script>
 </body>

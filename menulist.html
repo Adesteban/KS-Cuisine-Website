@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
  
      <!-- Site Metas -->
-    <title>Admin</title>  
+    <title>Menu</title>  
     <meta name="keywords" content="">
     <meta name="description" content="">
     <meta name="author" content="">
@@ -25,6 +25,12 @@
     <link rel="stylesheet" href="css/responsive.css">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="css/custom.css">
+		<style>
+		  .custom-container {
+		    background-color: #f8f9fa; /* Adjust the shade of gray as needed */
+		    color: #333; /* Set the text color */
+		  }
+		</style>
 
 </head>
 
@@ -44,8 +50,8 @@
 				</button>
 				<div class="collapse navbar-collapse" id="navbars-rs-food">
 					<ul class="navbar-nav ml-auto">
-						<li class="nav-item active"><a class="nav-link" href="admin.html">Home</a></li>
-						<li class="nav-item"><a class="nav-link" href="menulist.html">Menu</a></li>
+						<li class="nav-item"><a class="nav-link" href="admin.html">Home</a></li>
+						<li class="nav-item active"><a class="nav-link" href="menulist.html">Menu</a></li>
 						<li class="nav-item"><a class="nav-link" data-toggle="modal" data-target="#logoutModal">Logout</a></li>
 					</ul>
 				</div>
@@ -56,25 +62,89 @@
 
 
 	<div class="about-sections-box" >
-		<div class="container mt-5 " style="padding-top: 150px;">
+		<div class="custom-container container" style="padding-top: 200px;">
 		  <div class="row">
-		    <h1 class="my-4">User Information Database</h1>
-		    <table class="table table-striped table-bordered">
-		      <thead class="thead-dark">
-		        <tr>
-		          <th>ID No.</th>
-		          <th>First Name</th>
-		          <th>Last Name</th>
-		          <th>Username</th>
-		          <th>Email</th>
-		          <th>Update</th>
-		          <th>Delete</th>
-		        </tr>
-		      </thead>
-		      <tbody id="user-table"></tbody>
-		    </table>
+		    <div class="col-md-4">
+		      <button class="btn btn-secondary mb-3" type="button" data-toggle="collapse" data-target="#newMenuForm" aria-expanded="false" aria-controls="newMenuForm">
+		      	<i class="fa fa-cog fa-spin"></i>
+		        Toggle Form
+		      </button>
+		    </div>
+		   	<div class="col-md-4">
+
+		    </div>
+
+		    <div class="col-md-4">
+		      <div class="input-group mb-3">
+		        <input type="text" id="searchInput" class="form-control" placeholder="Search by Menu Name">
+		        <div class="input-group-append">
+		          <button id="searchButton" class="btn btn-outline-secondary" type="button">
+		            <i class="fa fa-search"></i>
+		          </button>
+		        </div>
+		      </div>
+		    </div>
 		  </div>
-		</div>   
+
+		  <div class="row">
+		    <div class="col-md-12">
+		      <div class="collapse" id="newMenuForm">
+		        <form class="gray-form">
+		          <div class="form-row">
+		            <h4>Add New Food</h4>
+		          </div>
+		          <div class="form-row">
+		            <div class="form-group col-md-3">
+		              <label for="menuName">Menu Name:</label>
+		              <input type="text" class="form-control" id="menuName" name="menuName" required>
+		            </div>
+		            <div class="form-group col-md-5">
+		              <label for="description">Description:</label>
+		              <input type="text" class="form-control" id="description" name="description" required>
+		            </div>
+		            <div class="form-group col-md-2">
+		              <label for="price">Price:</label>
+		              <input type="number" class="form-control" id="price" name="price" min="0" step="0.01" required>
+		            </div>
+		            <div class="form-group col-md-2">
+		              <label for="availability">Availability:</label>
+		              <input type="text" class="form-control" id="availability" required>
+		            </div>
+		          </div>
+		          <div class="form-row">
+		            <div class="form-group col-md-12">
+		              <button type="button" id="add-button" class="btn btn-success">Add</button>
+		            </div>
+		          </div>
+		        </form>
+		      </div>
+		    </div>
+		  </div>
+
+		  <div class="row">
+
+		  </div>
+
+		  <div class="row">
+		    <div class="col-md-12">
+		      <table class="table table-striped">
+		        <thead class="thead-dark">
+		          <tr>
+		            <th>Menu ID</th>
+		            <th>Menu Name</th>
+		            <th>Description</th>
+		            <th>Price</th>
+		            <th>Availability</th>
+		            <th>Update</th>
+		            <th>Delete</th>
+		          </tr>
+		        </thead>
+		        <tbody id="user-table"></tbody>
+		      </table>
+		    </div>
+		  </div>
+		</div>
+      
   </div>
 
 		<!-- Modal for Update -->
@@ -292,78 +362,145 @@
 		};
 
 		import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut, sendPasswordResetEmail, updateEmail, deleteUser } from 'https://www.gstatic.com/firebasejs/9.21.0/firebase-auth.js'
-		import { getDatabase, ref, set, limitToLast, get, orderByKey, query, equalTo, onValue, orderByChild, remove, update } from 'https://www.gstatic.com/firebasejs/9.21.0/firebase-database.js';
+		import { getDatabase, ref, set, limitToLast, get, orderByKey, query, equalTo, onValue, orderByChild, remove, update, child } from 'https://www.gstatic.com/firebasejs/9.21.0/firebase-database.js';
 
 		// Initialize Firebase
 		const app = initializeApp(firebaseConfig);
 		const analytics = getAnalytics(app);
 		const auth = getAuth();
 		const database = getDatabase();
-		const userRef = ref(database, 'Users');
-		const userTable = document.getElementById('user-table');
+		const menuRef = ref(database, 'Items');
+		const menuTable = document.getElementById('user-table');
 		const updateButtonModal = document.getElementById('update-button-modal');
 		const deleteButtonModal = document.getElementById('delete-button-modal')
+		const addNewItem = document.getElementById('add-button');
 		const logoutBtn = document.getElementById('logout-btn');
 
-		// Array to store selected user details
-	  let selectedUser = [];
+				// Array to store selected user details
+	  	let selectedUser = [];
+
+	  	function validateForm() {
+			  const menuNameInput = document.getElementById('menuName');
+			  const descriptionInput = document.getElementById('description');
+			  const priceInput = document.getElementById('price');
+			  const availabilityInput = document.getElementById('availability');
+
+			  const alphabeticPattern = /^[A-Za-z\s.,-éÉ]+$/;
+			  const numericPattern = /^\d+(\.\d{1,2})?$/;
+
+			  if (!alphabeticPattern.test(menuNameInput.value)) {
+			    alert('Invalid menu name. Please enter alphabetic characters only.');
+			    return false;
+			  }
+
+			  if (!alphabeticPattern.test(descriptionInput.value)) {
+			    alert('Invalid description. Please enter alphabetic characters only.');
+			    return false;
+			  }
+
+			  if (!numericPattern.test(priceInput.value)) {
+			    alert('Invalid price. Please enter a valid numeric value.');
+			    return false;
+			  }
+
+			  if (availabilityInput.value.trim() !== 'yes' && availabilityInput.value.trim() !== 'no') {
+			    alert('Invalid availability. Please enter either "yes" or "no".');
+			    return false;
+			  }
+
+			  return true;
+			}
 
 
-		const queryRef = query(userRef, orderByKey(), limitToLast(1));
-		get(queryRef)
-			.then((snapshot) => {
-				if(snapshot.exists()) {
-					const lastChildKey = Object.keys(snapshot.val())[0];
-					sessionStorage.setItem('lastId', lastChildKey);
-				}
-				else {
-					console.log("No data available")
-				}				
-			})
-			.catch((error) => {
-				console.log("Error fetching data", error);
-			});
+
+		addNewItem.addEventListener('click', async () => {
+			event.preventDefault();
+
+			if(!validateForm()) {
+				return;
+			}
+
+		  const name = document.getElementById('menuName');
+		  const description = document.getElementById('description');
+		  const price = document.getElementById('price');
+		  const availability = document.getElementById('availability');
+
+		   // Check if any of the form fields are empty
+		  if (name.value === '' || description.value === '' || price.value === '' || availability.value === '') {
+		    alert('Please fill in all the form fields.');
+		    return;
+		  }
+
+		  // Retrieve the items from the database
+		  get(ref(database, 'Items')).then((snapshot) => {
+		    const items = snapshot.val();
+		    let lastItemId = 0;
+
+		    if (items) {
+		      // Loop through the items to find the last item ID
+		      Object.keys(items).forEach((itemId) => {
+		        const currentItemId = parseInt(itemId, 10);
+		        if (currentItemId > lastItemId) {
+		          lastItemId = currentItemId;
+		        }
+		      });
+		    }
+
+		    // Generate the new item ID by adding 1 to the last item ID
+		    const newItemId = lastItemId + 1;
+
+		    // Create a new item object
+		    const newItem = {
+		      itemId: newItemId.toString(),
+		      name: name.value,
+		      description: description.value,
+		      price: price.value,
+		      available: availability.value
+		    };
+
+		    // Set the new item in the database using the generated ID
+		    set(ref(database, `Items/${newItemId}`), newItem)
+		      .then(() => {
+		        alert('New menu item added successfully!');
+		        // Additional logic after successful insertion
+		        name.value = "";
+		        description.value = "";
+		        price.value = "";
+		        availability.value = "";
+		      })
+		      .catch((error) => {
+		        console.log('Error adding new menu item:', error);
+		      });
+		  })
+		  .catch((error) => {
+		    console.log('Error retrieving last item ID:', error);
+		  });
+		});
 
 			updateButtonModal.addEventListener('click', async () => {
 				event.preventDefault(); 
 				try {
-					const userId = document.getElementById('update-id');
-					const fName = document.getElementById('update-fname');
-					const lName = document.getElementById('update-lname');
-					const username = document.getElementById('update-username');
-					const emailModal = document.getElementById('update-email');
-					const passwordModal = document.getElementById('update-password');
-					const email = emailModal.value;
-					const password = passwordModal.value;
-
-					// Update the user's email in Firebase Authentication
-					console.log(email);
-					console.log(password);
-
-					const user = auth.currentUser;
-					console.log(user);
-
-					await updateEmail(user, email);
-					console.log('Email address updated successfully');
-
-					await signOut(auth);
-					console.log("User logged out");
+					const itemId = document.getElementById('update-id');
+					const name = document.getElementById('update-fname');
+					const description = document.getElementById('update-lname');
+					const price = document.getElementById('update-username');
+					const availability = document.getElementById('update-email');
 
 					// get the updated user values and store it
-					const updatedUserDetails = {
-						firstName: fName.value,
-						lastName: lName.value,
-						username: username.value,
-						email: emailModal.value
+					const updatedMenuDetails = {
+						name: name.value,
+						description: description.value,
+						price: price.value,
+						available: availability.value
 					};
 					// Update the user data in the database
-          update(ref(database, `Users/${userId.value}`), updatedUserDetails)
+          update(ref(database, `Items/${itemId.value}`), updatedMenuDetails)
             .then(() => {
-              alert('User updated successfully!');
+              alert('Menu updated successfully!');
               $('#update-modal').modal('hide');
             })
             .catch((error) => {
-              console.log('Error updating user:', error);
+              console.log('Error updating menu:', error);
             });
 	      
 					// const userQuery = 
@@ -383,60 +520,77 @@
 			deleteButtonModal.addEventListener('click', async () => {
 			  try {
 			    const userId = document.getElementById('delete-userid').value;
-			    const user = auth.currentUser;
-			    
-			    // Delete user from Firebase Authentication
-			    await deleteUser(user, userId);
-			    console.log('User deleted from Firebase Authentication successfully');
 			    
 			    // Delete user from Realtime Database
-			    remove(ref(database, `Users/${userId}`))
+			    remove(ref(database, `Items/${userId}`))
 			    	.then(() => {
-			    		console.log('User deleted from Realtime Database successfully');			    
-			    		alert('User deleted successfully!');
+			    		console.log('Item deleted from Realtime Database successfully');			    
+			    		alert('Menu deleted successfully!');
 			    		$('#delete-modal').modal('hide');
 			    	}).catch((error) => {
-			    			console.error('Error deleting user:', error);
+			    			console.error('Error deleting menu:', error);
 			    	})
 
 			    // Perform any additional actions or UI updates after deletion
 			  } catch (error) {
-			    console.error('Error deleting user:', error);
+			    console.error('Error deleting menu:', error);
 			    // Handle the error accordingly
 			  }
 			});
 
+			// Get the search input and search button elements
+			const searchInput = document.getElementById('searchInput');
+			const searchButton = document.getElementById('searchButton');
+
+			// Attach a click event listener to the search button
+			searchButton.addEventListener('click', () => {
+			  // Get the search value
+			  const searchTerm = searchInput.value.toLowerCase().trim();
+
+			  // Get all the table rows
+			  const tableRows = document.querySelectorAll('#user-table tr');
+
+			  // Loop through the rows and hide/show based on the search term
+			  tableRows.forEach((row) => {
+			    const menuName = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+			    if (menuName.includes(searchTerm)) {
+			      row.style.display = '';
+			    } else {
+			      row.style.display = 'none';
+			    }
+			  });
+			});
+
 		function populateUserTable(snapshot) {
 		  // Clear the user table
-		  userTable.innerHTML = '';
+		  menuTable.innerHTML = '';
 
 		  // Iterate through the users
-		  snapshot.forEach((userSnapshot) => {
-		    const user = userSnapshot.val();
+		  snapshot.forEach((menuSnapshot) => {
+		    const item = menuSnapshot.val();
 		    const row = document.createElement('tr');
 		    row.innerHTML = `
-		      <td>${user.userId}</td>
-		      <td>${user.firstName}</td>
-		      <td>${user.lastName}</td>
-		      <td>${user.username}</td>
-		      <td>${user.email}</td>
-		      <td><button class="btn btn-primary update-btn" data-toggle="modal" data-target="#update-modal" data-user-id="${user.userId}"><i class="fa fa-pencil"></i></button></td>
-		      <td><button class="btn btn-danger delete-btn" data-toggle="modal" data-target="#delete-modal" data-user-id="${user.userId}"><i class="fa fa-trash"></i></button></td>
+		      <td>${item.itemId}</td>
+		      <td>${item.name}</td>
+		      <td>${item.description}</td>
+		      <td>₱ ${item.price}</td>
+		      <td>${item.available}</td>
+		      <td><button class="btn btn-primary update-btn" data-toggle="modal" data-target="#update-modal" data-user-id="${item.itemId}"><i class="fa fa-pencil"></i></button></td>
+		      <td><button class="btn btn-danger delete-btn" data-toggle="modal" data-target="#delete-modal" data-user-id="${item.itemId}"><i class="fa fa-trash"></i></button></td>
 		    `;
-		    userTable.appendChild(row);
+		    menuTable.appendChild(row);
 
 		    // Add click event listener to the update button in each row
 		    const updateButton = row.querySelector('.update-btn');
 		    updateButton.addEventListener('click', () => {
-		    	const userId = user.userId;
-				  const firstName = user.firstName;
-				  const lastName = user.lastName;
-				  const username = user.username;
-				  const email = user.email;
-				  const password = user.password;
+		    	const itemId = item.itemId;
+				  const name = item.name;
+				  const description = item.description;
+				  const price = item.price;
+				  const availability = item.available;
 
 				  // Insert each fields in an array
-		      selectedUser = [userId, firstName, lastName, username, email, password];
+		      selectedUser = [itemId, name, description, price, availability];
 		      document.getElementById('update-id').value = selectedUser[0];
 		      document.getElementById('update-fname').value = selectedUser[1];
 		      document.getElementById('update-lname').value = selectedUser[2];
@@ -446,30 +600,19 @@
 
 		      console.log(selectedUser); // Generate the selected user details to the console
 
-					signInWithEmailAndPassword(auth, email, password)
-					.then((userCredential) => {
-						const user = userCredential.user;
-						console.log('User logged in', user);
-					}).catch((error) => {
-						  // Error occurred during sign-in
-    					const errorCode = error.code;
-    					const errorMessage = error.message;
-    					console.error('Sign-in error:', errorCode, errorMessage);
-					});
 		    });
 
 		    // Add click event listener to the delete button in each row
 		    const deleteButton = row.querySelector('.delete-btn');
 		    deleteButton.addEventListener('click', () => {
-		      const userId = user.userId;
-		      const firstName = user.firstName;
-				  const lastName = user.lastName;
-				  const username = user.username;
-				  const email = user.email;
-				  const password = user.password;
+		    	const itemId = item.itemId;
+				  const name = item.name;
+				  const description = item.description;
+				  const price = item.price;
+				  const availability = item.available;
 		      
-		      // Insert each fields in an array
-		      selectedUser = [userId, firstName, lastName, username, email, password];
+				  // Insert each fields in an array
+		      selectedUser = [itemId, name, description, price, availability];
 		      document.getElementById('delete-userid').value = selectedUser[0];
 		      document.getElementById('delete-fname').value = selectedUser[1];
 		      document.getElementById('delete-lname').value = selectedUser[2];
@@ -479,21 +622,11 @@
 
 		      console.log(selectedUser); // Generate the selected user details to the console
 
-		      signInWithEmailAndPassword(auth, email, password)
-					.then((userCredential) => {
-						const user = userCredential.user;
-						console.log('User logged in', user);
-					}).catch((error) => {
-						  // Error occurred during sign-in
-    					const errorCode = error.code;
-    					const errorMessage = error.message;
-    					console.error('Sign-in error:', errorCode, errorMessage);
-					});
 		    });
 			});
 		}
 
-		onValue(userRef, (snapshot) => {
+		onValue(menuRef, (snapshot) => {
 		  populateUserTable(snapshot);
 		});
 

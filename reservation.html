@@ -137,22 +137,27 @@
 	    <h1>Food Order Form</h1>
 	    <form id="orderForm">
 	      <h4>Order Details</h4>
-	      <div class="form-group">
-	        <label for="item">Item:</label>
-	        <select class="form-control" id="item">
-	        </select>
+	      <div class="form-row">
+	      		<div class="form-group col-md-6">
+	      			 <label for="item">Items:</label>
+	        		 <select class="form-control" id="item">
+	        		 </select>
+	      		</div>
+	      		<div class="form-group col-md-2">
+			        <label for="quantity">Quantity:</label>
+			        <input type="number" class="form-control" id="quantity" min="1" max="10" step="1" value="1">
+			      </div>
 	      </div>
-	      <div class="form-group">
-	        <label for="quantity">Quantity:</label>
-	        <input type="number" class="form-control small-input" id="quantity" min="1" max="10" step="1" value="1">
+
+	      <div id="orderDetailsSection">
 	      </div>
+
 	      <div id="orderItems"></div>
 	      <button type="button" class="btn btn-success" id="addButton">
 	        <i class="fa fa-plus"></i> 
 	      </button>
 
-	      <div id="orderDetailsSection">
-	      </div>
+
 
 	      
 	      <hr>
@@ -162,10 +167,31 @@
 	        <label for="deliveryDate">Date of Delivery:</label>
 	        <input type="date" class="form-control" id="deliveryDate" required>
 	      </div>
-	      <div class="form-group">
-	        <label for="deliveryAddress">Delivery Address:</label>
-	        <textarea class="form-control" id="deliveryAddress" rows="3" required></textarea>
-	      </div>
+	        <div class="form-row">
+				    <div class="form-group col-md-4">
+				      <label for="houseNumber">House #:</label>
+				      <input type="text" class="form-control" id="houseNumber" required>
+				    </div>
+				    <div class="form-group col-md-8">
+				      <label for="street">Street:</label>
+				      <input type="text" class="form-control" id="street" required>
+				    </div>
+				  </div>
+
+				  <div class="form-row">
+				    <div class="form-group col-md-5">
+				      <label for="district">Barangay:</label>
+				      <input type="text" class="form-control" id="barangay" required>
+				    </div>
+				    <div class="form-group col-md-5">
+				      <label for="city">City:</label>
+				      <input type="text" class="form-control" id="city" required>
+				    </div>
+				    <div class="form-group col-md-2">
+				      <label for="zipCode">ZIP Code:</label>
+				      <input type="text" class="form-control" id="zipCode" required>
+				    </div>
+				  </div>
 
 	      <div class="form-group">
 	        <label>Mode of Payment:</label>
@@ -374,17 +400,13 @@
 		  const inputValue = this.value;
 
 		   // Check if input is empty or backspace key is pressed
-		  if (inputValue === "" || event.inputType === "deleteContentBackward") {
-		    this.value = "1"; // Set the value to 1
+		  if (quantityDropdownID.value === "" || quantityDropdownID.value < 1) {
+		    quantityDropdownID.value = "1"; // Set the value to 1
 		  }
 		  else if (inputValue > 99) {
 		  	this.value = "99";
 		  }
-		  
-		  // Check if the quantity is less than 0
-		  if (quantity < 0) {
-		    quantityDropdownID.value = 1; // Set the value to 0
-		  }
+
 		});
 
 		// Event listener for keydown event
@@ -402,10 +424,14 @@
 	  // Clear existing dropdown options
 	  itemDropdownID.innerHTML = "";
 
-	  // Iterate over the items and create dropdown options
-	  snapshot.forEach((childSnapshot) => {
-	    const item = childSnapshot.val();
+	  // Retrieve the items from the snapshot
+	  const items = snapshot.val();
 
+	  // Filter available items
+	  const availableItems = Object.values(items).filter((item) => item.available === 'yes');
+
+	  // Iterate over the available items and create dropdown options
+	  availableItems.forEach((item) => {
 	    // Create a new <option> element
 	    const option = document.createElement("option");
 	    option.value = item.price;
@@ -462,61 +488,82 @@
 		// Add Item button click event
 		document.getElementById("addButton").addEventListener("click", function() {
 		  const orderForm = document.getElementById("orderDetailsSection");
-		  
+
 		  // Create new item container
 		  const newItemContainer = document.createElement("div");
-		  newItemContainer.classList.add("item-container", "mt-4");
+		  newItemContainer.classList.add("form-row", "mt-4");
+
+		  // Create item column
+		  const itemCol = document.createElement("div");
+		  itemCol.classList.add("form-group", "col-md-6");
 
 		  // Create item label
-		  const itemLabel = document.createElement("label");
-		  itemLabel.textContent = "Item:";
-		  newItemContainer.appendChild(itemLabel);
-		  
+		  // const itemLabel = document.createElement("label");
+		  // itemLabel.textContent = "Item:";
+		  // itemCol.appendChild(itemLabel);
+
 		  // Create item dropdown
 		  const itemDropdown = document.createElement("select");
 		  itemDropdown.classList.add("form-control");
 		  itemDropdown.name = "item";
-		  
-		  // Add options to the item dropdown
+		  itemDropdown.id = "itemDropdownID"; // Assign an ID for reference
+
+		  itemCol.appendChild(itemDropdown);
+
+		  // Attach an event listener to listen for changes in the items data
 		  onValue(itemsRef, (snapshot) => {
-		  	itemDropdown.innerHTML = "";
+		    // Clear existing dropdown options
+		    itemDropdown.innerHTML = "";
 
-		  	snapshot.forEach((childSnapshot) => {
-			    const item = childSnapshot.val();
-			    const option = document.createElement("option");
-			    option.value = item.price;
-			    option.textContent = item.name;
-			    itemDropdown.appendChild(option);
-			  });
-		  })
-		  newItemContainer.appendChild(itemDropdown);
+		    // Retrieve the items from the snapshot
+		    const items = snapshot.val();
 
+		    // Filter available items
+		    const availableItems = Object.values(items).filter((item) => item.available === 'yes');
+
+		    // Iterate over the available items and create dropdown options
+		    availableItems.forEach((item) => {
+		      // Create a new <option> element
+		      const option = document.createElement("option");
+		      option.value = item.price;
+		      option.textContent = item.name;
+
+		      // Append the <option> to the dropdown
+		      itemDropdown.appendChild(option);
+		    });
+		  });
+		  // Create quantity column
+		  const quantityCol = document.createElement("div");
+		  quantityCol.classList.add("form-group", "col-md-2");
 
 		  // Create quantity label
-		  const quantityLabel = document.createElement("label");
-		  quantityLabel.textContent = "Quantity:";
-		  newItemContainer.appendChild(quantityLabel);
-		  
+		  // const quantityLabel = document.createElement("label");
+		  // quantityLabel.textContent = "Quantity:";
+		  // quantityCol.appendChild(quantityLabel);
+
 		  // Create quantity number field
 		  const quantityField = document.createElement("input");
 		  quantityField.type = "number";
-		  quantityField.classList.add("form-control", "small-input", "number-input");
+		  quantityField.classList.add("form-control");
 		  quantityField.name = "quantity";
 		  quantityField.min = "1";
 		  quantityField.max = "10";
 		  quantityField.step = "1";
 		  quantityField.value = "1";
-		  newItemContainer.appendChild(quantityField);
+		  quantityCol.appendChild(quantityField);
 
-		  // Event listener for the quantity field
-			quantityField.addEventListener("input", function() {
-			  if (quantityField.value === "" || quantityField.value < 1) {
-			    quantityField.value = "1";
-			  }else if (quantityField.value > 99) {
-			    quantityField.value = "99";
-			  }
-			});
-		  
+		  quantityField.addEventListener('input', () => {
+		  	if(quantityField.value === '' || quantityField.value < 1) {
+		  		quantityField.value = "1";
+		  	}else if(quantityField.value > 99) {
+		  		quantityField.value = "99";
+		  	}
+		  })
+
+		  // Create remove button column
+		  const removeCol = document.createElement("div");
+		  removeCol.classList.add("form-group", "col-md-1", "align-self-end");
+
 		  // Create remove button
 		  const removeButton = document.createElement("button");
 		  removeButton.type = "button";
@@ -533,11 +580,18 @@
 		    newItemContainer.remove();
 		  });
 
-		  newItemContainer.appendChild(removeButton);
-		  
+		  removeCol.appendChild(removeButton);
+
+		  // Append the columns to the item container
+		  newItemContainer.appendChild(itemCol);
+		  newItemContainer.appendChild(quantityCol);
+		  newItemContainer.appendChild(removeCol);
+
 		  // Append the new item container to the order form
 		  orderForm.appendChild(newItemContainer);
 		});
+
+
 
 		// Get the close button element
 		const closeButtonModal = document.getElementById("close-button-receipt");
@@ -586,13 +640,71 @@
 
 		const previewButton = document.getElementById("previewButton");
 
-		const deliveryAddress = document.getElementById("deliveryAddress");
+
 
 		previewButton.disabled = true;
 
-		deliveryAddress.addEventListener("input", function() {
-		  previewButton.disabled = deliveryAddress.value.trim() === "";
-		});
+		// deliveryAddress.addEventListener("input", function() {
+		//   previewButton.disabled = deliveryAddress.value.trim() === "";
+		// });
+
+		 const houseNumberInput = document.getElementById("houseNumber");
+	   const streetInput = document.getElementById("street");
+	   const districtInput = document.getElementById("barangay");
+	   const cityInput = document.getElementById("city");
+	   const zipCodeInput = document.getElementById("zipCode");
+
+	  // Function to check if the input contains only alphabetic characters
+		function isAlphabeticInput(input) {
+		  const alphabeticPattern = /^[A-Za-z\s.]+$/;	
+		  return alphabeticPattern.test(input);
+		}
+
+		// Function to check if all delivery address inputs are filled
+		function checkDeliveryAddressInputs() {
+		  const houseNumberValue = houseNumberInput.value.trim();
+		  const streetValue = streetInput.value.trim();
+		  const districtValue = districtInput.value.trim();
+		  const cityValue = cityInput.value.trim();
+		  const zipCodeValue = zipCodeInput.value.trim();
+
+		  return (
+		    houseNumberValue !== '' &&
+		    isAlphabeticInput(streetValue) &&
+		    isAlphabeticInput(districtValue) &&
+		    isAlphabeticInput(cityValue) &&
+		    zipCodeValue !== '' &&
+		    isValidZipCode(zipCodeValue) &&
+		    isValidHouseNo(houseNumberValue)
+		  );
+		}
+
+		// Function to validate the zip code input
+		function isValidZipCode(zipCode) {
+		  const zipCodePattern = /^\d{1,4}$/; // Pattern to match 1 to 9999
+		  const houseNoPattern = /^\d{1,4}$/; // Pattern to match 1 to 9999
+		  return zipCodePattern.test(zipCode);
+		}
+		function isValidHouseNo(houseNo) {
+		  const houseNoPattern = /^\d{1,4}$/; // Pattern to match 1 to 9999
+		  return houseNoPattern.test(houseNo);
+		}
+
+		// Add event listeners to the input fields
+		houseNumberInput.addEventListener('input', updatePreviewButtonState);
+		streetInput.addEventListener('input', updatePreviewButtonState);
+		districtInput.addEventListener('input', updatePreviewButtonState);
+		cityInput.addEventListener('input', updatePreviewButtonState);
+		zipCodeInput.addEventListener('input', updatePreviewButtonState);
+
+		// Function to update the state of the preview button
+		function updatePreviewButtonState() {
+		  const allInputsFilled = checkDeliveryAddressInputs();
+		  previewButton.disabled = !allInputsFilled;
+		}
+
+		// Initially update the preview button state
+		updatePreviewButtonState();
 
 		// Preview Order
 		previewButton.addEventListener("click", function() {
@@ -607,7 +719,12 @@
 
 		  console.log("Selected option: " + itemNameID.text);
 
-		  // const deliveryDate = document.getElementById("deliveryDate").value;
+		  // Retrieve the values from the input fields
+	    const houseNumber = document.getElementById("houseNumber").value;
+	    const street = document.getElementById("street").value;
+	    const district = document.getElementById("barangay").value;
+	    const city = document.getElementById("city").value;
+	    const zipCode = document.getElementById("zipCode").value;
 
 		  const paymentMode = document.querySelector('input[name="paymentMode"]:checked').value;
 
@@ -657,7 +774,7 @@
 		  orderSummaryHTML += `
 		    </ul>
 		    <p>Delivery Date: ${deliveryDateField.value}</p>
-		    <p>Delivery Address: ${deliveryAddress.value}</p>
+		    <p>Delivery Address: ${houseNumber}, ${street}, ${district}, ${city}, ${zipCode}</p>
 		    <p>Payment Mode: ${paymentMode}</p>
 		    <h4>Total Cost: ₱${totalCost}</h4>
 		  `;
@@ -673,12 +790,20 @@
 		  const orderDetails = {
 		    items: orderItems,
 		    deliveryDate: deliveryDate,
-		    deliveryAddress: deliveryAddress.value,
+	      deliveryAddress: {
+			    houseNumber: houseNumber,
+			    street: street,
+			    district: district,
+			    city: city,
+			    zipCode: zipCode
+			  },
 		    paymentMode: paymentMode,
 		    totalCost: totalCost
 		  };
 		  sessionStorage.setItem('orderDetails', JSON.stringify(orderDetails));
 		  console.log("Successfuly stored in sessionStorage");
+
+		});
 
 		  // Checkout button click event
 		  document.getElementById("checkoutButton").addEventListener("click", function() {
@@ -696,11 +821,10 @@
 		  sessionStorage.setItem('orders', JSON.stringify(existingOrders));
 
 
-		    // Refresh the page to clear all fields and reset the form
+		   // Refresh the page to clear all fields and reset the form
 		    location.reload();
 		  });
-		});
-
+	
 
 	</script>
 </body>
