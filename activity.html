@@ -33,7 +33,7 @@
       margin-bottom: 10px;
       text-align: center;
     }
-  </style>	
+  	</style>	
 
     <!--[if lt IE 9]>
       <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
@@ -88,13 +88,12 @@
 	<!-- End All Pages -->
 	
 	<!-- Start Stuff -->
-	<div class="stuff-box">
-	  <div class="container">
-	    <h1 class="mt-4">Activity</h1>
-
-			  <!-- Display the orders -->
-			  <div id="ordersContainer"></div>
-
+	<div class="container">
+	  <div class="card">
+	    <div class="card-body">
+	      <h1 class="mt-4">Activity</h1>
+	      <div id="ordersContainer"></div>
+	    </div>
 	  </div>
 	</div>
 	<!-- End Stuff -->
@@ -205,51 +204,113 @@
 	<script src="js/form-validator.min.js"></script>
     <script src="js/contact-form-script.js"></script>
     <script src="js/custom.js"></script>
-    <script type="text/javascript">
-	    // Retrieve the orders from session storage
-	    const orders = JSON.parse(sessionStorage.getItem('orders'));
+		<script type="module">
+		  // Import the functions you need from the SDKs you need
+		  import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.21.0/firebase-app.js';
+		  import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.21.0/firebase-analytics.js";
+		  import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.21.0/firebase-auth.js';
+		  import { getDatabase, ref, onValue, get} from 'https://www.gstatic.com/firebasejs/9.21.0/firebase-database.js';
 
-	    // Check if there are any orders
-	    if (orders && orders.length > 0) {
-	      // Build the HTML for displaying orders
-	      let ordersHTML = '';
-	      orders.forEach(order => {
-	        // Build the delivery address string
-	        const deliveryAddress = `${order.deliveryAddress.houseNumber} ${order.deliveryAddress.street}, ${order.deliveryAddress.district}, ${order.deliveryAddress.city}, ${order.deliveryAddress.zipCode}`;
+		  // Your web app's Firebase configuration
+		  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+		const firebaseConfig = {
+		  apiKey: "AIzaSyB4mZ38aXTLeiQdnlr6qfweQioYKG0j1yU",
+		  authDomain: "ks-cuisine.firebaseapp.com",
+		  databaseURL: "https://ks-cuisine-default-rtdb.firebaseio.com",
+		  projectId: "ks-cuisine",
+		  storageBucket: "ks-cuisine.appspot.com",
+		  messagingSenderId: "446458909737",
+		  appId: "1:446458909737:web:8976d968b60ae0b3f0f838",
+		  measurementId: "G-4DW5VGPK6B"
+		};
 
-	        // Build the HTML for the order
-	        ordersHTML += `
-	          <div class="order-box">
-	            <h4>Order Items:</h4>
-	            <ul>
-	        `;
+		  // Initialize Firebase
+		  const app = initializeApp(firebaseConfig);
+		  const analytics = getAnalytics(app);
+		  const auth = getAuth();
+		  const database = getDatabase();
+		  const transactionsRef = ref(database, "Transactions");
 
-	        order.items.forEach(item => {
-	          ordersHTML += `
-	            <li>- ${item.name}: ${item.quantity} x ₱${item.item} - Total: ₱${item.total}</li>
-	          `;
-	        });
+			document.addEventListener("DOMContentLoaded", function() {
+			  // Listen for changes in the user's authentication state
+			  onAuthStateChanged(auth, async function(user) {
+			    if (user) {
+			      // Retrieve the user's email
+			      const userEmail = user.email;
 
-	        ordersHTML += `
-	            </ul>
-	            <p>Delivery Date: ${order.deliveryDate}</p>
-	            <p>Delivery Address: ${deliveryAddress}</p>
-	            <p>Payment Mode: ${order.paymentMode}</p>
-	            <h4>Total Cost: ₱${order.totalCost}</h4>
-	          </div>
-	        `;
-	      });
+			      // Retrieve the transactions from the Realtime Database
+			      const snapshot = await get(ref(database, 'Transactions'));
+			      const transactions = snapshot.val();
 
-	      // Set the orders HTML to the orders container
-	      const ordersContainer = document.getElementById("ordersContainer");
-	      ordersContainer.innerHTML = ordersHTML;
-	    } else {
-	      // No orders found, display a message
-	      const noOrdersMessage = "<p>No orders found.</p>";
-	      const ordersContainer = document.getElementById("ordersContainer");
-	      ordersContainer.innerHTML = noOrdersMessage;
-	    }
+			      // Check if there are any transactions
+			      if (transactions && Array.isArray(transactions)) {
+			        // Filter transactions based on the user's email
+			        const userTransactions = transactions.filter(transaction => transaction.customerEmail === userEmail);
 
-    </script>
+			        if (userTransactions.length > 0) {
+			          // Build the HTML for displaying transactions
+			          let transactionsHTML = '';
+
+			          userTransactions.forEach(transaction => {
+
+			          	const address = `${transaction.deliveryAddress.houseNumber}, ${transaction.deliveryAddress.street}, ${transaction.deliveryAddress.district}, ${transaction.deliveryAddress.city}`;
+
+			          	console.log(address);
+			            // Build the HTML for each transaction
+			            transactionsHTML += `
+			              <div class="card mt-4">
+			                <div class="card-body">
+			                  <h2 class="card-title">Transaction ID: ${transaction.transactionID}</h2>
+			                  <hr>
+			                  <h3>Order Details:</h3>
+			                  <ul class="list-unstyled">
+			              `;
+
+			            transaction.orderDetails.forEach(order => {
+			              transactionsHTML += `
+			                <li>${order.menuName}: ${order.quantity} x ₱${order.price} - Total: ₱${order.total}</li>
+			              `;
+			            });
+
+			            transactionsHTML += `
+			                  </ul>
+			                  <br>
+			                  Delivery Address: ${address} <br>
+			                  Payment Mode: ${transaction.paymentMode}<br>
+			                  Date: ${transaction.date}
+			                  <hr>
+			                  <h3>Total: ₱${transaction.total}</h3>
+			                </div>
+			              </div>
+			            `;
+			          });
+
+			          // Set the transactions HTML to the container element
+			          const ordersContainer = document.getElementById("ordersContainer");
+			          ordersContainer.innerHTML = transactionsHTML;
+			        } else {
+			          // No transactions found for the user
+			          const noTransactionsMessage = "<p>No transactions found.</p>";
+			          const ordersContainer = document.getElementById("ordersContainer");
+			          ordersContainer.innerHTML = noTransactionsMessage;
+			        }
+			      } else {
+			        // No transactions found
+			        const noTransactionsMessage = "<p>No transactions found.</p>";
+			        const ordersContainer = document.getElementById("ordersContainer");
+			        ordersContainer.innerHTML = noTransactionsMessage;
+			      }
+			    } else {
+			      // No logged-in user
+			      const noUserMessage = "<p>No user is currently logged in.</p>";
+			      const ordersContainer = document.getElementById("ordersContainer");
+			      ordersContainer.innerHTML = noUserMessage;
+			    }
+			  });
+			});
+
+
+		</script>
+
 </body>
 </html>

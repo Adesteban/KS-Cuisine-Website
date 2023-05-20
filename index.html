@@ -14,7 +14,7 @@
     <meta name="author" content="">
 
     <!-- Site Icons -->
-    <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon">
+   <!--  <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon"> -->
     <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
 
     <!-- Bootstrap CSS -->
@@ -156,6 +156,12 @@
 <div class="form-outline mb-4">
     <input type="password" id="passwordBox" class="form-control" placeholder="Password" required />
     <div id="password-warning" style="display: none; color: red;"></div>
+</div>
+
+<!-- Confirm Password input -->
+<div class="form-outline mb-4">
+    <input type="password" id="confirmPasswordBox" class="form-control" placeholder="Confirm Password" required />
+    <div id="confirm-password-warning" style="display: none; color: red;"></div>
 </div>
 
 <!-- Checkbox -->
@@ -845,6 +851,7 @@
 	  const lnameWarning = document.getElementById('lname-warning');
 	  const emailWarning = document.getElementById('email-warning');
 	  const passwordWarning = document.getElementById('password-warning');
+	  const confirmPassWarning = document.getElementById('confirm-password-warning');
 
 
 		//-----------Check if there is a user currently logged in------------//
@@ -876,7 +883,7 @@
 		    const userAuth = await signInWithEmailAndPassword(auth, email, password);
 		    const user = userAuth.user;
 
-		    if (user.email === "kscuisine.admin@gmail.com") {
+		    if (user.email === "kscuisinea@gmail.com" || user.email === "kscuisine.admin@gmail.com") {
 		      // Redirect to admin.html for admin user
 		      console.log('Admin logged in', user.email);
 		      alert(`Admin ${user.email} successfully logged in.`);
@@ -949,13 +956,14 @@
 	  const username = usernameReg.value;
 	  const email = emailReg.value;
 	  const password = passwordReg.value;
+	  const confirmPassword = confirmPasswordBox.value;
 
 
 	  // Password must contain at least 8 characters, one lowercase letter, one uppercase letter, and one number
 	  const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/;
 	  const nameRegex = /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~0-9]/;
 
-	  if (fname === '' || lname === '' || username === '' || email === '' || password === '') {
+	  if (fname.trim() === '' || lname.trim() === '' || username.trim() === '' || email === '' || password === '') {
 	    console.log('Please answer all the fields.');
 	    passwordWarning.textContent = 'Please answer all the fields.';
 	    passwordWarning.style.display = 'block';
@@ -982,6 +990,12 @@
 	    passwordWarning.style.display = 'block';
 	    return;
 	  }
+	  if (password !== confirmPassword) {
+			console.log('Passwords do not match.');
+			confirmPassWarning.textContent = 'Passwords do not match.';
+			confirmPassWarning.style.display = 'block';
+			return;
+		}	
 
 	  try {
 	    const userCredential = await createUserWithEmailAndPassword(auth, email, password);

@@ -46,6 +46,7 @@
 					<ul class="navbar-nav ml-auto">
 						<li class="nav-item active"><a class="nav-link" href="admin.html">Home</a></li>
 						<li class="nav-item"><a class="nav-link" href="menulist.html">Menu</a></li>
+						<li class="nav-item"><a class="nav-link" href="transactions.html">Transactions</a></li>
 						<li class="nav-item"><a class="nav-link" data-toggle="modal" data-target="#logoutModal">Logout</a></li>
 					</ul>
 				</div>
@@ -56,7 +57,7 @@
 
 
 	<div class="about-sections-box" >
-		<div class="container mt-5 " style="padding-top: 150px;">
+		<div class="container custom-container " style="padding-top: 150px;">
 		  <div class="row">
 		    <h1 class="my-4">User Information Database</h1>
 		    <table class="table table-striped table-bordered">
@@ -67,7 +68,7 @@
 		          <th>Last Name</th>
 		          <th>Username</th>
 		          <th>Email</th>
-		          <th>Update</th>
+		<!--           <th>Update</th> -->
 		          <th>Delete</th>
 		        </tr>
 		      </thead>
@@ -324,53 +325,53 @@
 				console.log("Error fetching data", error);
 			});
 
-			updateButtonModal.addEventListener('click', async () => {
-				event.preventDefault(); 
-				try {
-					const userId = document.getElementById('update-id');
-					const fName = document.getElementById('update-fname');
-					const lName = document.getElementById('update-lname');
-					const username = document.getElementById('update-username');
-					const emailModal = document.getElementById('update-email');
-					const passwordModal = document.getElementById('update-password');
-					const email = emailModal.value;
-					const password = passwordModal.value;
+			// updateButtonModal.addEventListener('click', async () => {
+			// 	event.preventDefault(); 
+			// 	try {
+			// 		const userId = document.getElementById('update-id');
+			// 		const fName = document.getElementById('update-fname');
+			// 		const lName = document.getElementById('update-lname');
+			// 		const username = document.getElementById('update-username');
+			// 		const emailModal = document.getElementById('update-email');
+			// 		const passwordModal = document.getElementById('update-password');
+			// 		const email = emailModal.value;
+			// 		const password = passwordModal.value;
 
-					// Update the user's email in Firebase Authentication
-					console.log(email);
-					console.log(password);
+			// 		// Update the user's email in Firebase Authentication
+			// 		console.log(email);
+			// 		console.log(password);
 
-					const user = auth.currentUser;
-					console.log(user);
+			// 		const user = auth.currentUser;
+			// 		console.log(user);
 
-					await updateEmail(user, email);
-					console.log('Email address updated successfully');
+			// 		await updateEmail(user, email);
+			// 		console.log('Email address updated successfully');
 
-					await signOut(auth);
-					console.log("User logged out");
+			// 		await signOut(auth);
+			// 		console.log("User logged out");
 
-					// get the updated user values and store it
-					const updatedUserDetails = {
-						firstName: fName.value,
-						lastName: lName.value,
-						username: username.value,
-						email: emailModal.value
-					};
-					// Update the user data in the database
-          update(ref(database, `Users/${userId.value}`), updatedUserDetails)
-            .then(() => {
-              alert('User updated successfully!');
-              $('#update-modal').modal('hide');
-            })
-            .catch((error) => {
-              console.log('Error updating user:', error);
-            });
+			// 		// get the updated user values and store it
+			// 		const updatedUserDetails = {
+			// 			firstName: fName.value,
+			// 			lastName: lName.value,
+			// 			username: username.value,
+			// 			email: emailModal.value
+			// 		};
+			// 		// Update the user data in the database
+   //        update(ref(database, `Users/${userId.value}`), updatedUserDetails)
+   //          .then(() => {
+   //            alert('User updated successfully!');
+   //            $('#update-modal').modal('hide');
+   //          })
+   //          .catch((error) => {
+   //            console.log('Error updating user:', error);
+   //          });
 	      
-					// const userQuery = 
-				}catch(error) {
-					console.log("Error: ", error);
-				}
-			});
+			// 		// const userQuery = 
+			// 	}catch(error) {
+			// 		console.log("Error: ", error);
+			// 	}
+			// });
 
 			// Logout any authenticated user from admin
 			logoutBtn.addEventListener('click', async () => {
@@ -420,43 +421,42 @@
 		      <td>${user.lastName}</td>
 		      <td>${user.username}</td>
 		      <td>${user.email}</td>
-		      <td><button class="btn btn-primary update-btn" data-toggle="modal" data-target="#update-modal" data-user-id="${user.userId}"><i class="fa fa-pencil"></i></button></td>
 		      <td><button class="btn btn-danger delete-btn" data-toggle="modal" data-target="#delete-modal" data-user-id="${user.userId}"><i class="fa fa-trash"></i></button></td>
 		    `;
 		    userTable.appendChild(row);
 
 		    // Add click event listener to the update button in each row
-		    const updateButton = row.querySelector('.update-btn');
-		    updateButton.addEventListener('click', () => {
-		    	const userId = user.userId;
-				  const firstName = user.firstName;
-				  const lastName = user.lastName;
-				  const username = user.username;
-				  const email = user.email;
-				  const password = user.password;
+		   //  const updateButton = row.querySelector('.update-btn');
+		   //  updateButton.addEventListener('click', () => {
+		   //  	const userId = user.userId;
+				 //  const firstName = user.firstName;
+				 //  const lastName = user.lastName;
+				 //  const username = user.username;
+				 //  const email = user.email;
+				 //  const password = user.password;
 
-				  // Insert each fields in an array
-		      selectedUser = [userId, firstName, lastName, username, email, password];
-		      document.getElementById('update-id').value = selectedUser[0];
-		      document.getElementById('update-fname').value = selectedUser[1];
-		      document.getElementById('update-lname').value = selectedUser[2];
-		      document.getElementById('update-username').value = selectedUser[3];
-		      document.getElementById('update-email').value = selectedUser[4];
-		      document.getElementById('update-password').value = selectedUser[5];
+				 //  // Insert each fields in an array
+		   //    selectedUser = [userId, firstName, lastName, username, email, password];
+		   //    document.getElementById('update-id').value = selectedUser[0];
+		   //    document.getElementById('update-fname').value = selectedUser[1];
+		   //    document.getElementById('update-lname').value = selectedUser[2];
+		   //    document.getElementById('update-username').value = selectedUser[3];
+		   //    document.getElementById('update-email').value = selectedUser[4];
+		   //    document.getElementById('update-password').value = selectedUser[5];
 
-		      console.log(selectedUser); // Generate the selected user details to the console
+		   //    console.log(selectedUser); // Generate the selected user details to the console
 
-					signInWithEmailAndPassword(auth, email, password)
-					.then((userCredential) => {
-						const user = userCredential.user;
-						console.log('User logged in', user);
-					}).catch((error) => {
-						  // Error occurred during sign-in
-    					const errorCode = error.code;
-    					const errorMessage = error.message;
-    					console.error('Sign-in error:', errorCode, errorMessage);
-					});
-		    });
+					// signInWithEmailAndPassword(auth, email, password)
+					// .then((userCredential) => {
+					// 	const user = userCredential.user;
+					// 	console.log('User logged in', user);
+					// }).catch((error) => {
+					// 	  // Error occurred during sign-in
+    	// 				const errorCode = error.code;
+    	// 				const errorMessage = error.message;
+    	// 				console.error('Sign-in error:', errorCode, errorMessage);
+					// });
+		   //  });
 
 		    // Add click event listener to the delete button in each row
 		    const deleteButton = row.querySelector('.delete-btn');

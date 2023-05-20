@@ -179,17 +179,13 @@
 				  </div>
 
 				  <div class="form-row">
-				    <div class="form-group col-md-5">
+				    <div class="form-group col-md-6">
 				      <label for="district">Barangay:</label>
 				      <input type="text" class="form-control" id="barangay" required>
 				    </div>
-				    <div class="form-group col-md-5">
+				    <div class="form-group col-md-6">
 				      <label for="city">City:</label>
 				      <input type="text" class="form-control" id="city" required>
-				    </div>
-				    <div class="form-group col-md-2">
-				      <label for="zipCode">ZIP Code:</label>
-				      <input type="text" class="form-control" id="zipCode" required>
 				    </div>
 				  </div>
 
@@ -457,11 +453,14 @@
 				console.log("Error fetching data", error);
 			});
 
+	let emailCheck = ''
+
 		//-----------Check if there is a user currently logged in------------//
 		auth.onAuthStateChanged((user) => {
 			if (user) {
 				// A user is logged in, therefore update UI accordingly
 				console.log(`A user with email: ${user.email} is currently logged in.`);
+				emailCheck = user.email;
 				// Hide the modal
 				// $('#loginModal').modal('hide');
 			}
@@ -652,7 +651,6 @@
 	   const streetInput = document.getElementById("street");
 	   const districtInput = document.getElementById("barangay");
 	   const cityInput = document.getElementById("city");
-	   const zipCodeInput = document.getElementById("zipCode");
 
 	  // Function to check if the input contains only alphabetic characters
 		function isAlphabeticInput(input) {
@@ -666,25 +664,16 @@
 		  const streetValue = streetInput.value.trim();
 		  const districtValue = districtInput.value.trim();
 		  const cityValue = cityInput.value.trim();
-		  const zipCodeValue = zipCodeInput.value.trim();
 
 		  return (
 		    houseNumberValue !== '' &&
 		    isAlphabeticInput(streetValue) &&
 		    isAlphabeticInput(districtValue) &&
 		    isAlphabeticInput(cityValue) &&
-		    zipCodeValue !== '' &&
-		    isValidZipCode(zipCodeValue) &&
 		    isValidHouseNo(houseNumberValue)
 		  );
 		}
 
-		// Function to validate the zip code input
-		function isValidZipCode(zipCode) {
-		  const zipCodePattern = /^\d{1,4}$/; // Pattern to match 1 to 9999
-		  const houseNoPattern = /^\d{1,4}$/; // Pattern to match 1 to 9999
-		  return zipCodePattern.test(zipCode);
-		}
 		function isValidHouseNo(houseNo) {
 		  const houseNoPattern = /^\d{1,4}$/; // Pattern to match 1 to 9999
 		  return houseNoPattern.test(houseNo);
@@ -695,7 +684,6 @@
 		streetInput.addEventListener('input', updatePreviewButtonState);
 		districtInput.addEventListener('input', updatePreviewButtonState);
 		cityInput.addEventListener('input', updatePreviewButtonState);
-		zipCodeInput.addEventListener('input', updatePreviewButtonState);
 
 		// Function to update the state of the preview button
 		function updatePreviewButtonState() {
@@ -709,6 +697,7 @@
 		// Preview Order
 		previewButton.addEventListener("click", function() {
 		  event.preventDefault();
+
 		  const deliveryDate = document.getElementById("deliveryDate").value;
 
 		  const itemID = itemDropdownID.value;
@@ -720,21 +709,20 @@
 		  console.log("Selected option: " + itemNameID.text);
 
 		  // Retrieve the values from the input fields
-	    const houseNumber = document.getElementById("houseNumber").value;
-	    const street = document.getElementById("street").value;
-	    const district = document.getElementById("barangay").value;
-	    const city = document.getElementById("city").value;
-	    const zipCode = document.getElementById("zipCode").value;
+		  const houseNumber = document.getElementById("houseNumber").value;
+		  const street = document.getElementById("street").value;
+		  const district = document.getElementById("barangay").value;
+		  const city = document.getElementById("city").value;
 
 		  const paymentMode = document.querySelector('input[name="paymentMode"]:checked').value;
 
 		  // Add the item to the order items array
-		  orderItems.push({
+		  const orderItems = [{
 		    name: itemNameID.text,
 		    item: itemID,
 		    quantity: quantityID,
 		    total: itemTotalID
-		  });
+		  }];
 
 		  // Iterate through the item dropdowns and quantity fields
 		  for (let i = 0; i < itemDropdowns.length; i++) {
@@ -774,7 +762,7 @@
 		  orderSummaryHTML += `
 		    </ul>
 		    <p>Delivery Date: ${deliveryDateField.value}</p>
-		    <p>Delivery Address: ${houseNumber}, ${street}, ${district}, ${city}, ${zipCode}</p>
+		    <p>Delivery Address: ${houseNumber}, ${street}, ${district}, ${city}</p>
 		    <p>Payment Mode: ${paymentMode}</p>
 		    <h4>Total Cost: ₱${totalCost}</h4>
 		  `;
@@ -786,45 +774,62 @@
 		  // Show the modal
 		  $('#receiptModal').modal('show');
 
-		  // Save order details in session storage
-		  const orderDetails = {
-		    items: orderItems,
-		    deliveryDate: deliveryDate,
-	      deliveryAddress: {
-			    houseNumber: houseNumber,
-			    street: street,
-			    district: district,
-			    city: city,
-			    zipCode: zipCode
-			  },
-		    paymentMode: paymentMode,
-		    totalCost: totalCost
-		  };
-		  sessionStorage.setItem('orderDetails', JSON.stringify(orderDetails));
-		  console.log("Successfuly stored in sessionStorage");
-
-		});
-
 		  // Checkout button click event
-		  document.getElementById("checkoutButton").addEventListener("click", function() {
+		  document.getElementById("checkoutButton").addEventListener("click", async function() {
+		    // Retrieve existing orders from the Transactions table
+			  const snapshot = await get(ref(database, 'Transactions'));
+			  const transactions = snapshot.val();
 
-		  // Retrieve existing orders from session storage
-		  const existingOrders = JSON.parse(sessionStorage.getItem('orders')) || [];
+			  // Generate a new transaction ID
+			  let newTransactionId = 1;
+			  if (transactions) {
+			    // Loop through the transactions to find the last transaction ID
+			    Object.keys(transactions).forEach((transactionId) => {
+			      const currentTransactionId = parseInt(transactionId, 10);
+			      if (currentTransactionId >= newTransactionId) {
+			        newTransactionId = currentTransactionId + 1;
+			      }
+			    });
+			  }
 
-		  // Retrieve the current order details from session storage
-		  const orderDetails = JSON.parse(sessionStorage.getItem('orderDetails'));
+			const currentTime = new Date();
+			const formattedTime = currentTime.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true });
+			console.log(formattedTime);
 
-		  // Add the current order to the list
-		  existingOrders.push(orderDetails);
+		    // Build the transaction object
+		    const transaction = {
+		      transactionID: newTransactionId.toString(),
+		      date: new Date().toLocaleDateString(),
+		      time: formattedTime,
+		      customerEmail: emailCheck,
+		      total: totalCost,
+		      orderDetails: orderItems.map(item => ({
+		        orderID: item.item,
+		        menuName: item.name,
+		        quantity: item.quantity,
+		        price: item.item,
+		        total: item.total
+		      })),
+		      paymentMode: paymentMode,
+		      deliveryAddress: {
+				    houseNumber: houseNumber,
+				    street: street,
+				    district: district,
+				    city: city
+				  }
+		    };
 
-		  // Save the updated list back to session storage
-		  sessionStorage.setItem('orders', JSON.stringify(existingOrders));
-
-
-		   // Refresh the page to clear all fields and reset the form
-		    location.reload();
+		    // Store the transaction data in the "Transactions" table in the Realtime Database
+		    set(ref(database, `Transactions/${newTransactionId}`), transaction)
+		      .then(() => {
+		        // Refresh the page to clear all fields and reset the form
+		        location.reload();
+		      })
+		      .catch(error => {
+		        console.log('Error storing transaction data:', error);
+		      });
 		  });
-	
+		});
 
 	</script>
 </body>

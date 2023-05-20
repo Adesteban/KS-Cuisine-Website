@@ -79,48 +79,51 @@
 	<!-- End All Pages -->
 	
 	<!-- Start Contact -->
-	<div class="map-full"></div>
 			<div class="contact-box">
 			  <div class="container">
-			    <div class="row">
+			  	<div class="row">
 			      <div class="col-lg-12">
 			        <div class="heading-title text-center">
 			          <h2>Contact</h2>
 			          <p>Thank you for your interest in contacting us. Please fill out the form below to get in touch with us. We'll do our best to get back to you as soon as possible. Alternatively, you can email us directly or reach out to us on social media.</p>
 			        </div>
 			      </div>
+
 			    </div>
-			    <div class="row">
-			      <div class="col-lg-12">
-			        <form id="contactForm">
-			          <div class="row">
-			            <div class="col-md-12">
-			              <div class="form-group">
-			                <input type="text" class="form-control" id="name" name="name" placeholder="Your Name" required data-error="Please enter your name">
-			                <div class="help-block with-errors"></div>
-			              </div>
-			            </div>
-			            <div class="col-md-12">
-			              <div class="form-group">
-			                <input type="email" placeholder="Your Email" id="email" class="form-control" name="email" required data-error="Please enter a valid email">
-			                <div class="help-block with-errors"></div>
-			              </div>
-			            </div>
-			            <div class="col-md-12">
-			              <div class="form-group">
-			                <textarea class="form-control" id="message" placeholder="Your Message" rows="4" data-error="Write your message" required></textarea>
-			                <div class="help-block with-errors"></div>
-			              </div>
-			              <div class="submit-button text-center">
-			                <button class="btn btn-common" id="submit" type="button" onclick="sendEmail()">Send Message</button>
-			                <div id="msgSubmit" class="h3 text-center hidden"></div>
-			                <div class="clearfix"></div>
-			              </div>
-			            </div>
-			          </div>
-			        </form>
-			      </div>
-			    </div>
+			  	<div class="row">
+			  		<div class="col-md-6">
+			  			<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3859.957443630374!2d120.9735348097683!3d14.658356575602742!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3397b42dfcff7d97%3A0xba8266f9e236ab2c!2s105%20Samson%20Rd%2C%20Caloocan%2C%201407%20Metro%20Manila!5e0!3m2!1sen!2sph!4v1684540538916!5m2!1sen!2sph" width="400" height="300" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+			  		</div>
+			  			<div class="col-md-6">
+				        <form id="contactForm">
+				          <div class="row">
+				            <div class="col-md-12">
+				              <div class="form-group">
+				                <input type="text" class="form-control" id="name" name="name" placeholder="Your Name" required data-error="Please enter your name">
+				                <div class="help-block with-errors"></div>
+				              </div>
+				            </div>
+				            <div class="col-md-12">
+				              <div class="form-group">
+				                <input type="email" placeholder="Your Email" id="email" class="form-control" name="email" required data-error="Please enter a valid email">
+				                <div class="help-block with-errors"></div>
+				              </div>
+				            </div>
+				            <div class="col-md-12">
+				              <div class="form-group">
+				                <textarea class="form-control" id="message" placeholder="Your Message" rows="4" data-error="Write your message" required></textarea>
+				                <div class="help-block with-errors"></div>
+				              </div>
+				              <div class="submit-button text-center">
+				                <button class="btn btn-common" id="submit" type="button" onclick="sendEmail()">Send Message</button>
+				                <div id="msgSubmit" class="h3 text-center hidden"></div>
+				                <div class="clearfix"></div>
+				              </div>
+				            </div>
+				          </div>
+				        </form>
+				     </div>
+			  	</div>
 			  </div>
 			</div>
 	<!-- End Contact -->
@@ -234,7 +237,7 @@
     <script src="js/custom.js"></script>
 		<script>
 		  function sendEmail() {
-		    var recipient = 'kscuisine.admin@gmail.com';
+		    var recipient = 'kscuisinea@gmail.com';
 		    var subject = 'Thank you for Contacting Us!';
 		    var message = document.getElementById('message').value;
 
@@ -245,5 +248,6 @@
 		    window.location.href = mailtoLink;
 		  }
 		</script>
+
 </body>
 </html>
